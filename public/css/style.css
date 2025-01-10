@@ -1,48 +1,105 @@
 /* public/css/style.css */
 
-/* Variables globales */
+/* ===================== */
+/* VARIABLES GLOBALES    */
+/* ===================== */
 :root {
+    /* Couleurs de base (possibilité de les ajuster) */
     --primary-color: #4e73df;
     --secondary-color: #858796;
     --success-color: #1cc88a;
     --info-color: #36b9cc;
     --warning-color: #f6c23e;
     --danger-color: #e74a3b;
+
+    /* Nouveau gradient sombre (à ajuster selon tes goûts) */
+    --dark-gradient: linear-gradient(to right, #2b0a7d, #693fbb);
+
+    /* Couleur de texte par défaut sur fond sombre */
+    --text-color: #ffffff;
 }
 
-/* Styles généraux */
+/* ===================== */
+/* STYLES GÉNÉRAUX       */
+/* ===================== */
 body {
-    
+    background:
+    linear-gradient(
+        to right,
+        rgba(17, 4, 50, 0.941),  /* 0.7 = 70% d’opacité */
+        rgba(61, 36, 111, 0.819)
+      ),
+      url('https://t4.ftcdn.net/jpg/08/38/89/45/360_F_838894512_nSvlM0KyiEIm5pVNoDUFkhDpoDVPMQce.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  
+    color: #fffeffe0;
     min-height: 100vh;
+    margin: 0;
     display: flex;
     flex-direction: column;
-}
+  }
 
 main {
     flex: 1;
+    /* S’il te faut un padding global, tu peux l’ajouter ici */
+    /* padding: 1rem; */
 }
 
-/* Personnalisation de la navbar */
+/* ===================== */
+/* NAVBAR                */
+/* ===================== */
+.navbar {
+    /* Rendre la navbar transparente pour laisser voir le gradient en dessous ;
+       ou choisir une couleur unie plus sombre si tu préfères un contraste. */
+    background-color: rgba(0, 0, 0, 0.3) !important; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 .navbar-brand i {
     color: #fff;
 }
 
-/* Cartes */
+/* Lien actif, hovered, etc. (pour la navbar) */
+.navbar-nav .nav-link {
+    color: #ffffff !important;
+}
+.navbar-nav .nav-link:hover {
+    color: #f1f1f1 !important;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff !important;
+}
+
+/* ===================== */
+/* CARTES                */
+/* ===================== */
 .card {
+    background-color: rgba(0,0,0,0.3); /* Fond sombre semi‐transparent */
+    border: none;
     transition: transform 0.2s ease-in-out;
+    color: var(--text-color); /* Texte clair */
 }
 
 .card:hover {
     transform: translateY(-2px);
 }
 
-/* Badges de statut */
+/* ===================== */
+/* BADGES DE STATUT      */
+/* ===================== */
 .badge {
     font-size: 0.85em;
     padding: 0.35em 0.65em;
 }
 
-/* Système de notation (étoiles) */
+/* ===================== */
+/* SYSTÈME DE NOTATION   */
+/* ===================== */
 .rating {
     display: flex;
     flex-direction: row-reverse;
@@ -72,24 +129,32 @@ main {
     color: #ffd700;
 }
 
-/* Grille des livres */
+/* ===================== */
+/* GRILLE DES LIVRES     */
+/* ===================== */
 .book-card {
     height: 100%;
     transition: all 0.3s ease;
+    background-color: rgba(0,0,0,0.3); /* Sombre comme les .card */
+    color: var(--text-color);
 }
 
 .book-card:hover {
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
 }
 
-/* Priorité des livres */
-.priority-1 { border-left: 4px solid #e74a3b; }
-.priority-2 { border-left: 4px solid #f6c23e; }
-.priority-3 { border-left: 4px solid #4e73df; }
-.priority-4 { border-left: 4px solid #1cc88a; }
-.priority-5 { border-left: 4px solid #36b9cc; }
+/* ===================== */
+/* PRIORITÉ DES LIVRES   */
+/* ===================== */
+.priority-1 { border-left: 4px solid var(--danger-color); }
+.priority-2 { border-left: 4px solid var(--warning-color); }
+.priority-3 { border-left: 4px solid var(--primary-color); }
+.priority-4 { border-left: 4px solid var(--success-color); }
+.priority-5 { border-left: 4px solid var(--info-color); }
 
-/* Animation des messages flash */
+/* ===================== */
+/* ANIMATION FLASH       */
+/* ===================== */
 .alert {
     animation: slideInDown 0.5s ease-out;
 }
@@ -105,21 +170,30 @@ main {
     }
 }
 
-/* Personnalisation des formulaires */
+/* ===================== */
+/* FORMULAIRES           */
+/* ===================== */
 .form-control:focus,
 .form-select:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    color: #000; /* Garder le texte sombre dans le champ si background clair */
 }
 
-/* Boutons d'action */
+/* ===================== */
+/* BOUTONS D'ACTION      */
+/* ===================== */
 .btn-group-sm > .btn i {
     font-size: 0.875rem;
 }
 
-/* Dashboard */
+/* ===================== */
+/* DASHBOARD             */
+/* ===================== */
 .dashboard-stat-card {
     border-left: 4px solid;
+    background-color: rgba(0,0,0,0.3);
+    color: var(--text-color);
 }
 
 .dashboard-stat-card .icon {
@@ -127,17 +201,24 @@ main {
     font-size: 2rem;
 }
 
-/* Pagination */
+/* ===================== */
+/* PAGINATION            */
+/* ===================== */
 .pagination .page-link {
     color: var(--primary-color);
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .pagination .page-item.active .page-link {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
+    color: #fff;
 }
 
-/* Responsive */
+/* ===================== */
+/* RESPONSIVE            */
+/* ===================== */
 @media (max-width: 768px) {
     .dashboard-stat-card {
         margin-bottom: 1rem;
@@ -149,14 +230,23 @@ main {
     }
 }
 
-/* Dark mode */
+/* ===================== */
+/* MODE DARK AUTOMATIQUE */
+/* ===================== */
+/* Si l’utilisateur a défini un thème sombre par défaut sur son OS, on peut affiner encore. 
+   Ici, on override éventuellement la navbar ou autres, mais tu peux déjà tout forcer en sombre. */
+
 @media (prefers-color-scheme: dark) {
+    /* Par exemple, si tu voulais forcer un background plus noir encore */
+    /* body {
+        background: #1a1d29;
+    } */
+
     .navbar {
-        background-color: #1a1d29 !important;
+        background-color: rgba(0,0,0,0.5) !important;
     }
     
     .card {
-        background-color: #242837;
-        border: none;
+        background-color: rgba(255,255,255,0.04);
     }
 }
