@@ -1,0 +1,47 @@
+<form method="POST" class="book-form" action="/books">
+    <div class="form-group mb-3">
+        <label for="title">Titre *</label>
+        <input type="text" id="title" name="title" class="form-control" value="{{ book.title }}" required>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="authors">Auteurs * (séparés par des virgules)</label>
+        <input type="text" id="authors" name="authors" class="form-control" value="{{ book.authors|join(', ') }}" required>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="category">Catégorie *</label>
+        <select id="category" name="category" class="form-control" required>
+            <option value="">Sélectionner...</option>
+            <option value="Programming">Programming</option>
+            <option value="DevOps">DevOps</option>
+            <option value="Design Patterns">Design Patterns</option>
+            <option value="Architecture">Architecture</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="pageCount">Nombre de pages</label>
+        <input type="number" id="pageCount" name="pageCount" class="form-control" value="{{ book.pageCount }}">
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="readingStatus">Statut *</label>
+        <select id="readingStatus" name="readingStatus" class="form-control" required>
+            <option value="À lire">À lire</option>
+            <option value="En cours">En cours</option>
+            <option value="Terminé">Terminé</option>
+        </select>
+    </div>
+
+    <div class="form-group mb-3">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" class="form-control">{{ book.notes }}</textarea>
+    </div>
+
+    <div class="text-end">
+        <button type="button" class="btn btn-secondary" onclick="history.back()">Annuler</button>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    </div>
+</form>

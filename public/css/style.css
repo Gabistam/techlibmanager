@@ -1,0 +1,162 @@
+/* public/css/style.css */
+
+/* Variables globales */
+:root {
+    --primary-color: #4e73df;
+    --secondary-color: #858796;
+    --success-color: #1cc88a;
+    --info-color: #36b9cc;
+    --warning-color: #f6c23e;
+    --danger-color: #e74a3b;
+}
+
+/* Styles généraux */
+body {
+    
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Personnalisation de la navbar */
+.navbar-brand i {
+    color: #fff;
+}
+
+/* Cartes */
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Badges de statut */
+.badge {
+    font-size: 0.85em;
+    padding: 0.35em 0.65em;
+}
+
+/* Système de notation (étoiles) */
+.rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+}
+
+.rating input {
+    display: none;
+}
+
+.rating label {
+    cursor: pointer;
+    padding: 0 0.1em;
+    font-size: 1.5rem;
+}
+
+.rating label i {
+    color: #ddd;
+}
+
+.rating input:checked ~ label i {
+    color: #ffd700;
+}
+
+.rating label:hover i,
+.rating label:hover ~ label i {
+    color: #ffd700;
+}
+
+/* Grille des livres */
+.book-card {
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.book-card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+/* Priorité des livres */
+.priority-1 { border-left: 4px solid #e74a3b; }
+.priority-2 { border-left: 4px solid #f6c23e; }
+.priority-3 { border-left: 4px solid #4e73df; }
+.priority-4 { border-left: 4px solid #1cc88a; }
+.priority-5 { border-left: 4px solid #36b9cc; }
+
+/* Animation des messages flash */
+.alert {
+    animation: slideInDown 0.5s ease-out;
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Personnalisation des formulaires */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Boutons d'action */
+.btn-group-sm > .btn i {
+    font-size: 0.875rem;
+}
+
+/* Dashboard */
+.dashboard-stat-card {
+    border-left: 4px solid;
+}
+
+.dashboard-stat-card .icon {
+    opacity: 0.3;
+    font-size: 2rem;
+}
+
+/* Pagination */
+.pagination .page-link {
+    color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-stat-card {
+        margin-bottom: 1rem;
+    }
+    
+    .book-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .navbar {
+        background-color: #1a1d29 !important;
+    }
+    
+    .card {
+        background-color: #242837;
+        border: none;
+    }
+}

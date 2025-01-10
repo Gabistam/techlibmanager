@@ -1,0 +1,44 @@
+{# views/layout/base.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechLib Manager - {% block title %}{% endblock %}</title>
+    {# Bootstrap CSS #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {# Font Awesome #}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-dymN8J4Pj/E0nF6E2Qyj4C6G5j9Bn4xr4haDH0cLHQkN1u7MJ/4bz7pEexDA2H2XJxvCylx+jV1R7JMQX3t3Yw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    {# Custom CSS #}
+    <link rel="stylesheet" href="/css/style.css">
+    {% block stylesheets %}{% endblock %}
+</head>
+<body class="bg-light">
+    <header>
+        {% include 'partials/navbar.twig' %}
+    </header>
+
+    <main class="container py-4">
+        {% block flash_messages %}
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        {% endblock %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'partials/footer.twig' %}
+
+    {# Bootstrap Bundle JS #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>
