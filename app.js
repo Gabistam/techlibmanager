@@ -3,42 +3,49 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 
-// Importation du fichier de route user.js
-const userRoutes = require('./routes/books');
+// Connexion à la base de données
+const { connectDB } = require('./config/database');
 
 // Import des middlewares
 const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
 const notFoundHandler = require('./middleware/notFoundHandler');
 
-const {connectDB} =require('./config/database');
+// Import de tes routes
+const userRoutes = require('./routes/books');   // routes pour la gestion des livres
+const authRoutes = require('./routes/auth');    // routes pour l'authentification (signup/login)
 
 const app = express();
 
-// Connexion à la base de données
+// 1) Connexion à la base de données
 connectDB();
 
-// Configuration
+// 2) Configuration du moteur de templates
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'twig');
 
-// Middlewares
+// 3) Middlewares généraux
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(requestLogger);  // Logging des requêtes
+app.use(requestLogger); // Logging des requêtes (si ton middleware le fait)
 
-// // Route pour la page d'accueil
+// 4) Routes
+// Page d'accueil éventuelle
 // app.get('/', (req, res) => {
-//     res.render('dashboard');
-//   });
+//   res.render('home'); // ou 'dashboard' si tu veux
+// });
 
-// Routes définies dans le fichier user.js
+// Routes « livres »
 app.use('/', userRoutes);
 
-// Gestion des erreurs
-app.use(notFoundHandler);  // 404
-app.use(errorHandler);     // 500 et autres erreurs
+// Routes « auth »
+app.use('/auth', authRoutes);
 
+// 5) Gestion des erreurs
+app.use(notFoundHandler); // 404
+app.use(errorHandler);    // 500 etc.
+
+// 6) Lancement du serveur
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
