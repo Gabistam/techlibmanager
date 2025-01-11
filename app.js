@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 // Connexion à la base de données
 const { connectDB } = require('./config/database');
@@ -11,41 +12,36 @@ const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
 const notFoundHandler = require('./middleware/notFoundHandler');
 
-// Import de tes routes
-const userRoutes = require('./routes/books');   // routes pour la gestion des livres
-const authRoutes = require('./routes/auth');    // routes pour l'authentification (signup/login)
+// Import des routes
+const bookRoutes = require('./routes/books');   // routes pour la gestion des livres
+const authRoutes = require('./routes/auth');    // routes pour l'authentification
 
 const app = express();
 
 // 1) Connexion à la base de données
 connectDB();
 
-// 2) Configuration du moteur de templates
+// 2) Configuration
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'twig');
 
-// 3) Middlewares généraux
+// 3) Middlewares
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(requestLogger); // Logging des requêtes (si ton middleware le fait)
+app.use(express.json());
+app.use(cookieParser());
+app.use(requestLogger);
 
 // 4) Routes
-// Page d'accueil éventuelle
-// app.get('/', (req, res) => {
-//   res.render('home'); // ou 'dashboard' si tu veux
-// });
-
-// Routes « livres »
-app.use('/', userRoutes);
-
-// Routes « auth »
-app.use('/auth', authRoutes);
+// Route racine vers la page d'accueil
+app.use('/', authRoutes);  // Les routes d'auth géreront la page d'accueil
+app.use('/books', bookRoutes);  // Toutes les routes de livres commencent par /books
 
 // 5) Gestion des erreurs
-app.use(notFoundHandler); // 404
-app.use(errorHandler);    // 500 etc.
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-// 6) Lancement du serveur
+// 6) Démarrage
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Serveur démarré sur le port ${PORT}`);

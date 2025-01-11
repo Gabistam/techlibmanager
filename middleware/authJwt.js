@@ -1,28 +1,35 @@
-// middlewares/authJwt.js
 const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
   try {
-    // Récupérer le header Authorization: Bearer <token>
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      return res.status(401).json({ message: 'Token manquant.' });
-    }
-    
-    const token = authHeader.split(' ')[1];
+    // Vérifier la présence du token dans les cookies ou les en-têtes
+    const token = req.cookies.token || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+
     if (!token) {
-      return res.status(401).json({ message: 'Token invalide.' });
+      // Si aucun token, rediriger ou envoyer une réponse JSON selon le contexte
+      if (req.headers.accept && req.headers.accept.includes('application/json')) {
+        return res.status(401).json({ message: 'Token manquant.' });
+      } else {
+        return res.redirect('/login');
+      }
     }
-    
-    // Vérifier le token
+
+    // Vérifier et décoder le token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // On stocke l'ID utilisateur dans req.user
+
+    // Ajouter les informations du token à la requête
     req.user = { id: decoded.userId };
-    
+
+    // Passer au middleware ou route suivante
     next();
   } catch (err) {
-    console.error(err);
-    res.status(401).json({ message: 'Accès non autorisé, token invalide ou expiré.' });
+    console.error('Erreur de vérification du token :', err.message);
+
+    // Gérer les erreurs de validation du token
+    if (req.headers.accept && req.headers.accept.includes('application/json')) {
+      return res.status(401).json({ message: 'Accès non autorisé, token invalide ou expiré.' });
+    } else {
+      return res.redirect('/login');
+    }
   }
 };

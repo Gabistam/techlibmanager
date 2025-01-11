@@ -53,15 +53,16 @@ exports.dashboard = async (req, res) => {
             .limit(5)
             .lean();
 
-        res.render('dashboard', { 
+        res.render('pages/dashboard', {  
             stats,
             categoryLabels,
             categoryData,
-            recentBooks
+            recentBooks,
+            user: req.user  // Ajout de l'utilisateur pour la navbar
         });
     } catch (err) {
         console.error('Erreur dans le contrôleur dashboard:', err);
-        res.status(500).render('error/500');
+        res.status(500).render('error/500', { user: req.user });
     }
 };
 

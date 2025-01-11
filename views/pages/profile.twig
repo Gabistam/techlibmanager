@@ -1,0 +1,107 @@
+{# views/profile.twig #}
+{% extends "layout/base.twig" %}
+
+{% block title %}Mon Profil{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Mon Profil</h1>
+
+    {# Zone d'informations personnelles #}
+    <section class="mb-5">
+        <h2>Mes informations</h2>
+        <ul class="list-group">
+            <li class="list-group-item">
+                <strong>Email : </strong> {{ user.email }}
+            </li>
+            {% if user.displayName %}
+                <li class="list-group-item">
+                    <strong>Nom d'utilisateur : </strong> {{ user.displayName }}
+                </li>
+            {% endif %}
+            {# Ajoute d'autres champs si nécessaire, ex. user.firstname, etc. #}
+        </ul>
+    </section>
+    
+    {# Zone de modification du mot de passe #}
+    <section class="mb-5">
+        <h2>Modifier mon mot de passe</h2>
+
+        {% if passwordUpdateError %}
+            <div class="alert alert-danger">
+                {{ passwordUpdateError }}
+            </div>
+        {% endif %}
+
+        {% if passwordUpdateSuccess %}
+            <div class="alert alert-success">
+                {{ passwordUpdateSuccess }}
+            </div>
+        {% endif %}
+
+        <form action="/profile/update-password" method="POST" class="card p-3">
+            <div class="mb-3">
+                <label for="currentPassword" class="form-label">Mot de passe actuel</label>
+                <input 
+                    type="password" 
+                    class="form-control" 
+                    id="currentPassword" 
+                    name="currentPassword" 
+                    required
+                >
+            </div>
+            <div class="mb-3">
+                <label for="newPassword" class="form-label">Nouveau mot de passe</label>
+                <input 
+                    type="password" 
+                    class="form-control" 
+                    id="newPassword" 
+                    name="newPassword" 
+                    required
+                >
+            </div>
+            <div class="mb-3">
+                <label for="confirmNewPassword" class="form-label">Confirmer le nouveau mot de passe</label>
+                <input 
+                    type="password" 
+                    class="form-control" 
+                    id="confirmNewPassword" 
+                    name="confirmNewPassword" 
+                    required
+                >
+            </div>
+            <button type="submit" class="btn btn-primary">
+                Enregistrer les modifications
+            </button>
+        </form>
+    </section>
+
+    {# Zone de suppression du compte #}
+    <section class="mb-5">
+        <h2>Supprimer mon compte</h2>
+
+        {% if deletionError %}
+            <div class="alert alert-danger">
+                {{ deletionError }}
+            </div>
+        {% endif %}
+
+        {% if deletionSuccess %}
+            <div class="alert alert-success">
+                {{ deletionSuccess }}
+            </div>
+        {% endif %}
+
+        <p class="text-danger">
+            Attention : cette action est irréversible et supprimera définitivement votre compte 
+            ainsi que toutes vos données associées.
+        </p>
+
+        <form action="/profile/delete" method="POST">
+            <button type="submit" class="btn btn-danger">
+                Supprimer mon compte
+            </button>
+        </form>
+    </section>
+</div>
+{% endblock %}
