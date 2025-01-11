@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const authJwt = require('../middlewares/authJwt');
+const authJwt = require('../middleware/authJwt');
 
 // Inscription (public)
 router.post('/signup', authController.signup);

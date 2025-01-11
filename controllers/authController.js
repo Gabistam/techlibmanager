@@ -55,3 +55,11 @@ exports.login = async (req, res) => {
     res.status(500).json({ message: 'Erreur interne du serveur.' });
   }
 };
+
+exports.profile = (req, res) => {
+    res.send('Mon profil');
+  };
+
+exports.logout = (req, res) => {
+    res.send('Déconnexion');
+  };
