@@ -104,6 +104,13 @@ exports.login = async (req, res) => {
 };
 
 exports.logout = (req, res) => {
-    res.render('pages/auth/login', { user: null });
-  };
+    // Supprimer le token des cookies
+    res.clearCookie('token');
+    
+    // Supprimer les informations utilisateur de res.locals
+    res.locals.user = null;
+
+    // Rediriger vers la page de login
+    res.redirect('/login');
+};
 

@@ -29,7 +29,7 @@ body {
         rgba(17, 4, 50, 0.941),  /* 0.7 = 70% d’opacité */
         rgba(61, 36, 111, 0.819)
       ),
-      url('https://t4.ftcdn.net/jpg/08/38/89/45/360_F_838894512_nSvlM0KyiEIm5pVNoDUFkhDpoDVPMQce.jpg');
+      url('../img/digital-library.webp');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

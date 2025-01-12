@@ -1,103 +1,169 @@
 {# views/home.twig #}
 {% extends "layout/base.twig" %}
 
-{% block title %}Accueil - Dev Web Library
+{% block title %}TechLib Manager - Votre Bibliothèque Technique{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* Styles spécifiques à la page d'accueil */
+    .hero-section {
+        height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                    url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?q=80');
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0 20px;
+        border-radius: 25px;
+    }
+
+    .parallax-section {
+        height: 400px;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                    url('https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80');
+        background-attachment: fixed;
+        background-position: center;
+        background-size: cover;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 100px 0;
+        border-radius: 25px;
+    }
+
+    .features-section {
+        padding: 100px 0;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 25px;
+    }
+
+    .feature-card {
+        padding: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        transition: transform 0.3s ease;
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+    }
+
+    .cta-section {
+        padding: 80px 0;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 25px;
+    }
+
+    .section-spacing {
+        margin: 150px 0;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-	<div class="row justify-content-center">
-		<div class="col-md-8 text-center">
-			<h1 class="my-4">Bienvenue sur Dev Web Library</h1>
+    {# Hero Section #}
+    <section class="hero-section mb-5">
+        <div class="container">
+            <h1 class="display-2 mb-4">TechLib Manager</h1>
+            <p class="lead mb-5">Gérez votre collection de livres techniques et suivez votre progression d'apprentissage</p>
+            {% if not user %}
+                <div class="mt-5">
+                    <a href="/signup" class="btn btn-primary btn-lg mx-2">Commencer maintenant</a>
+                    <a href="/login" class="btn btn-outline-light btn-lg mx-2">Se connecter</a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
 
-			<p class="lead">
-				Un espace dédié aux livres et ressources qui façonnent l'univers du développement web.
-								            Que vous soyez débutant ou expert, enrichissez vos connaissances
-								            et gardez un œil sur les dernières tendances en front-end & back-end.
-			</p>
+    {# Features Section #}
+    <section class="features-section mt-6">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card h-100">
+                        <i class="fas fa-book-open fa-3x mb-4 text-primary"></i>
+                        <h3>Bibliothèque Personnalisée</h3>
+                        <p>Organisez vos livres techniques par catégories et suivez votre progression de lecture</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card h-100">
+                        <i class="fas fa-chart-line fa-3x mb-4 text-primary"></i>
+                        <h3>Suivi de Progression</h3>
+                        <p>Visualisez vos statistiques de lecture et gérez vos priorités d'apprentissage</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card h-100">
+                        <i class="fas fa-tasks fa-3x mb-4 text-primary"></i>
+                        <h3>Gestion Efficace</h3>
+                        <p>Définissez des priorités et organisez votre parcours d'apprentissage</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-			<hr
-			class="my-4">
+    {# Parallax Section #}
+    <section class="parallax-section">
+        <div class="container text-center">
+            <h2 class="display-4">Développez vos compétences</h2>
+            <p class="lead">Une bibliothèque technique bien organisée est la clé d'un apprentissage efficace</p>
+        </div>
+    </section>
 
-			{# Section de présentation / CTA pour utilisateurs non connectés #}
-			<div class="mb-4">
-				<h3 class="mb-3">Accès limité ? Pas pour longtemps !</h3>
-				<p>
-					Créez un compte pour accéder à l’intégralité de nos livres, classés 
-										                par catégories (React, Vue, Node.js, etc.), et bénéficiez
-										                d’un suivi personnalisé de vos lectures.
-				</p>
-			</div>
+    {# Featured Books Section #}
+    <section class="section-spacing">
+        <div class="container">
+            <h2 class="text-center mb-5">Livres Tendances</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="glass-card p-4">
+                        <h5>"Clean Code"</h5>
+                        <p>Robert C. Martin</p>
+                        <span class="badge bg-primary">Programmation</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card p-4">
+                        <h5>"Design Patterns"</h5>
+                        <p>Gang of Four</p>
+                        <span class="badge bg-primary">Architecture</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card p-4">
+                        <h5>"Refactoring"</h5>
+                        <p>Martin Fowler</p>
+                        <span class="badge bg-primary">Bonnes Pratiques</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-			<div>
-				<a href="/signup" class="btn btn-primary btn-lg me-2" role="button">
-					Créer un compte
-				</a>
-				<a href="/login" class="btn btn-outline-light btn-lg" role="button">
-					Se connecter
-				</a>
-			</div>
-
-			{# Section "Aperçu des livres" ou mise en avant #}
-			<div class="mt-5">
-				<h4>Nos sélections récentes</h4>
-				<p class="text-light">
-					Découvrez nos dernières acquisitions pour booster vos compétences.
-				</p>
-
-				<div
-					class="row">
-					<!-- Exemple de cartes d'aperçu, statique ou dynamique -->
-					<div class="col-md-4">
-						<div class="card bg-dark text-white mb-3">
-							<div class="card-body">
-								<h5 class="card-title">“Clean Code”
-								</h5>
-								<br>
-								<p class="card-text">Robert C. Martin</p>
-								<p class="card-text">
-									<small>Une référence incontournable pour améliorer la qualité du code.</small>
-								</p>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-4">
-						<div class="card bg-dark text-white mb-3">
-							<div class="card-body">
-								<h5 class="card-title">“JavaScript: The Good Parts”</h5>
-								<p class="card-text">Douglas Crockford</p>
-								<p class="card-text">
-									<small>Comprendre les subtilités de JavaScript et l'écrire proprement.</small>
-								</p>
-							</div>
-						</div>
-					</div>
-
-					<div class="col-md-4">
-						<div class="card bg-dark text-white mb-3">
-							<div class="card-body">
-								<h5 class="card-title">“Node.js Design Patterns”</h5>
-								<p class="card-text">Mario Casciaro & Luciano Mammino</p>
-								<p class="card-text">
-									<small>Des exemples concrets pour concevoir des applis Node.js robustes.</small>
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<p class="mt-3">
-					<em>Envie d’en voir plus ?</em><br>
-					<a href="/login" class="btn btn-outline-primary btn-sm">
-						Connectez-vous
-					</a>
-					ou
-					<a href="/signup" class="btn btn-outline-success btn-sm">
-						inscrivez-vous
-					</a>
-					pour explorer l'ensemble de notre catalogue.
-				</p>
-			</div>
-		</div>
-	</div>
+    {# CTA Section #}
+    <section class="cta-section text-center mb-5">
+        <div class="container">
+            <h2 class="mb-4">Prêt à organiser votre apprentissage ?</h2>
+            <p class="mb-4">Rejoignez TechLib Manager et commencez à gérer efficacement votre bibliothèque technique</p>
+            {% if not user %}
+                <a href="/signup" class="btn btn-primary btn-lg">Créer un compte gratuit</a>
+            {% endif %}
+        </div>
+    </section>
 {% endblock %}

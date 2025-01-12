@@ -3,7 +3,7 @@
 {% block title %}Nouveau livre{% endblock %}
 
 {% block content %}
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-5">
         <h1 class="h3">
             <i class="fas fa-plus-circle me-2"></i>Ajouter un livre
         </h1>
@@ -14,7 +14,7 @@
 
     <div class="row">
         <div class="col-lg-12">
-            {% include 'books/_form.twig' with {'book': book} %}
+            {% include 'pages/books/_form.twig' with {'book': book} %}
         </div>
     </div>
 {% endblock %}

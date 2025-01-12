@@ -101,7 +101,7 @@ exports.list = async (req, res) => {
             
         const total = await Book.countDocuments({ user: req.user.id });
         
-        res.render('/pages/books/list', {
+        res.render('pages/books/list', {
             books,
             currentPage: page,
             pages: Math.ceil(total / limit),
