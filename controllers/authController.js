@@ -137,9 +137,21 @@ exports.githubCallback = [
     }),
     (req, res) => {
         try {
-            console.log('GitHub callback user:', req.user);
-            const token = generateToken(req.user);
+            console.log('GitHub callback - req.user:', req.user);
             
+            if (!req.user) {
+                console.error('No user object in GitHub callback');
+                return res.redirect('/login');
+            }
+
+            if (!req.user._id) {
+                console.error('User object missing _id:', req.user);
+                return res.redirect('/login');
+            }
+
+            const token = generateToken(req.user);
+            console.log('Generated token:', token);
+
             res.cookie('token', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
@@ -149,6 +161,7 @@ exports.githubCallback = [
             res.redirect('/books');
         } catch (error) {
             console.error('GitHub callback error:', error);
+            console.error('Error stack:', error.stack);
             res.redirect('/login');
         }
     }
