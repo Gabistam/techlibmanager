@@ -1,10 +1,22 @@
 // controllers/bookController.js
 const Book = require('../models/Book');
+const mongoose = require('mongoose');
 
 exports.dashboard = async (req, res) => {
     try {
-        // Agrégation par readingStatus
+        console.log('User data:', req.user);
+        
+        // Correction ici - Utiliser new pour créer l'ObjectId
+        const userId = new mongoose.Types.ObjectId(req.user.id);
+        console.log('UserId converti:', userId);
+
+        // Correction des agrégations également
         const readingStats = await Book.aggregate([
+            { 
+                $match: { 
+                    user: userId  // Utilisation de l'ID converti
+                } 
+            },
             {
                 $group: {
                     _id: '$readingStatus',
@@ -12,6 +24,8 @@ exports.dashboard = async (req, res) => {
                 }
             }
         ]);
+        console.log('Reading stats:', readingStats);
+
 
         // Initialisation des statistiques
         const stats = {
@@ -34,8 +48,13 @@ exports.dashboard = async (req, res) => {
             stats.total += stat.count;
         });
 
-        // Agrégation par catégorie pour le graphique
+        // Agrégation par catégorie pour le graphique (filtré par utilisateur)
         const categoryStats = await Book.aggregate([
+            { 
+                $match: { 
+                    user: userId  // Utilisation du même ID converti
+                } 
+            },
             {
                 $group: {
                     _id: '$category',
@@ -47,120 +66,151 @@ exports.dashboard = async (req, res) => {
         const categoryLabels = categoryStats.map(cat => cat._id);
         const categoryData = categoryStats.map(cat => cat.count);
 
-        // Récupération des derniers livres ajoutés
-        const recentBooks = await Book.find()
-            .sort({ addedAt: -1 })
+        // Récupération des derniers livres ajoutés de l'utilisateur
+        const recentBooks = await Book.find({ user: req.user.id })
+            .sort({ createdAt: -1 })
             .limit(5)
             .lean();
 
-        res.render('pages/dashboard', {  
+        res.render('pages/books/dashboard', { 
             stats,
             categoryLabels,
             categoryData,
             recentBooks,
-            user: req.user  // Ajout de l'utilisateur pour la navbar
+            user: req.user
         });
     } catch (err) {
         console.error('Erreur dans le contrôleur dashboard:', err);
-        res.status(500).render('error/500', { user: req.user });
+        res.status(500).render('error/500', { 
+            user: req.user,
+            error: err.message
+         });
     }
 };
-
 
 exports.list = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
         
-        const books = await Book.find()
+        // Filtrer les livres par utilisateur
+        const books = await Book.find({ user: req.user.id })
             .sort('-priority')
             .skip((page - 1) * limit)
             .limit(limit);
             
-        const total = await Book.countDocuments();
+        const total = await Book.countDocuments({ user: req.user.id });
         
-        res.render('books/list', {
+        res.render('/pages/books/list', {
             books,
             currentPage: page,
-            pages: Math.ceil(total / limit)
+            pages: Math.ceil(total / limit),
+            user: req.user
         });
     } catch (err) {
-        res.status(500).render('error/500');
+        res.status(500).render('error/500', { user: req.user });
     }
 };
 
 exports.show = async (req, res) => {
     try {
-        const book = await Book.findById(req.params.id);
+        // Vérifier que le livre appartient à l'utilisateur
+        const book = await Book.findOne({
+            _id: req.params.id,
+            user: req.user.id
+        });
+
         if (!book) {
-            return res.status(404).render('error/404');
+            return res.status(404).render('error/404', { user: req.user });
         }
-        res.render('books/show', { book });
+        res.render('pages/books/show', { book, user: req.user });
     } catch (err) {
-        res.status(500).render('error/500');
+        res.status(500).render('error/500', { user: req.user });
     }
 };
 
 exports.createForm = (req, res) => {
-    res.render('books/create', { book: {} });
+    res.render('pages/books/create', { book: {}, user: req.user });
 };
 
 exports.create = async (req, res) => {
     try {
-        console.log('Données reçues:', req.body);
-        const book = new Book(req.body);
-        console.log('Book avant sauvegarde:', book);
+        // Ajouter l'ID de l'utilisateur aux données du livre
+        const bookData = {
+            ...req.body,
+            user: req.user.id
+        };
+
+        const book = new Book(bookData);
+        console.log('Livre à sauvegarder:', book);
         await book.save();
-        console.log('Book sauvegardé:', book);
+        
         res.redirect('/books/' + book._id);
     } catch (err) {
-        console.error('Erreur de sauvegarde:', err);
-        res.render('books/create', {
+        console.error('Erreur de création:', err);
+        res.render('pages/books/create', {
             book: req.body,
-            errors: err.errors
+            errors: err.errors,
+            user: req.user
         });
     }
 };
 
 exports.editForm = async (req, res) => {
     try {
-        const book = await Book.findById(req.params.id);
+        // Vérifier que le livre appartient à l'utilisateur
+        const book = await Book.findOne({
+            _id: req.params.id,
+            user: req.user.id
+        });
+
         if (!book) {
-            return res.status(404).render('error/404');
+            return res.status(404).render('error/404', { user: req.user });
         }
-        res.render('books/edit', { book });
+        res.render('pages/books/edit', { book, user: req.user });
     } catch (err) {
-        res.status(500).render('error/500');
+        res.status(500).render('error/500', { user: req.user });
     }
 };
 
 exports.update = async (req, res) => {
     try {
-        const book = await Book.findByIdAndUpdate(
-            req.params.id,
+        // Mettre à jour uniquement si le livre appartient à l'utilisateur
+        const book = await Book.findOneAndUpdate(
+            {
+                _id: req.params.id,
+                user: req.user.id
+            },
             req.body,
             { new: true, runValidators: true }
         );
+
         if (!book) {
-            return res.status(404).render('error/404');
+            return res.status(404).render('error/404', { user: req.user });
         }
         res.redirect('/books/' + book._id);
     } catch (err) {
-        res.render('books/edit', {
+        res.render('pages/books/edit', {
             book: { ...req.body, _id: req.params.id },
-            errors: err.errors
+            errors: err.errors,
+            user: req.user
         });
     }
 };
 
 exports.delete = async (req, res) => {
     try {
-        const book = await Book.findByIdAndDelete(req.params.id);
+        // Supprimer uniquement si le livre appartient à l'utilisateur
+        const book = await Book.findOneAndDelete({
+            _id: req.params.id,
+            user: req.user.id
+        });
+
         if (!book) {
-            return res.status(404).render('error/404');
+            return res.status(404).render('error/404', { user: req.user });
         }
         res.redirect('/books');
     } catch (err) {
-        res.status(500).render('error/500');
+        res.status(500).render('error/500', { user: req.user });
     }
 };

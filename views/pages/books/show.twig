@@ -1,0 +1,155 @@
+{% extends "layout/base.twig" %}
+
+{% block title %}
+	{{ book.title }}
+{% endblock %}
+
+{% block content %}
+	<div class="d-flex justify-content-between align-items-center mb-4">
+		<h1 class="h3">Détails du livre</h1>
+		<div>
+			<a href="/books/{{ book._id }}/edit" class="btn btn-primary me-2">
+				<i class="fas fa-edit me-1"></i>Modifier
+			</a>
+			<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+				<i class="fas fa-trash me-1"></i>Supprimer
+			</button>
+			<a href="/books" class="btn btn-outline-light ms-2">
+				<i class="fas fa-arrow-left me-1"></i>Retour
+			</a>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-8">
+			<div class="card shadow-sm mb-4">
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-12">
+							<h2 class="h4 mb-3">{{ book.title }}</h2>
+							<p class="text-light mb-4">
+								Par
+								{{ book.authors|join(', ') }}
+							</p>
+
+							<div class="row mb-4">
+								<div class="col-md-6">
+									<h6 class="text-uppercase text-light mb-2">Catégorie</h6>
+									<span class="badge bg-secondary">{{ book.category }}</span>
+								</div>
+								<div class="col-md-6">
+									<h6 class="text-uppercase text-light mb-2">Status</h6>
+									{% set statusClass = {
+                                        'À lire': 'warning',
+                                        'En cours': 'info',
+                                        'Terminé': 'success'
+                                    } %}
+									<span class="badge bg-{{ statusClass[book.readingStatus] }}">
+										{{ book.readingStatus }}
+									</span>
+								</div>
+							</div>
+
+							<div class="row mb-4">
+								<div class="col-md-6">
+									<h6 class="text-uppercase text-light mb-2">ISBN</h6>
+									<p>{{ book.isbn ?: 'Non renseigné' }}</p>
+								</div>
+								<div class="col-md-6">
+									<h6 class="text-uppercase text-light mb-2">Nombre de pages</h6>
+									<p>{{ book.pageCount ?: 'Non renseigné' }}</p>
+								</div>
+							</div>
+
+							<div class="row mb-4">
+								<div class="col-md-6">
+									<h6 class="text-uppercase text-light mb-2">Priorité</h6>
+									<div>
+										{% for i in 1..5 %}
+											<i class="fas fa-star {{ i <= book.priority ? 'text-warning' : 'text-light' }}"></i>
+										{% endfor %}
+									</div>
+								</div>
+								<div class="col-md-6">
+									<h6 class="text-uppercase text-light mb-2">Date d'ajout</h6>
+									<p>{{ book.addedAt|date('d/m/Y') }}</p>
+								</div>
+							</div>
+
+							{% if book.notes %}
+								<h6 class="text-uppercase text-light mb-2">Notes</h6>
+								<div class="card bg-light">
+									<div class="card-body text-dark">
+										{{ book.notes|nl2br }}
+									</div>
+								</div>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="card shadow-sm mb-4">
+				<div class="card-header">
+					<h5 class="card-title mb-0">Statistiques</h5>
+				</div>
+				<div class="card-body">
+					<div class="d-flex align-items-center mb-3">
+						<div class="flex-shrink-0">
+							<i class="fas fa-clock fa-2x text-primary"></i>
+						</div>
+						<div class="flex-grow-1 ms-3">
+							<h6 class="mb-0">Temps estimé de lecture</h6>
+							<small class="text-light">
+								{% if book.pageCount %}
+									{{ (book.pageCount / 30)|round }}
+									heures
+								{% else %}
+									Non calculable
+								{% endif %}
+							</small>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{% if book.readingStatus == 'Terminé' %}
+				<div class="card shadow-sm bg-success text-white">
+					<div class="card-body">
+						<h6 class="mb-2">
+							<i class="fas fa-check-circle me-1"></i>
+							Lecture terminée
+						</h6>
+						<p class="mb-0">Bravo ! Vous avez terminé ce livre.</p>
+					</div>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+
+	{# Modal de confirmation de suppression #}
+	<div class="modal fade" id="deleteModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Confirmer la suppression</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<p>Êtes-vous sûr de vouloir supprimer "{{ book.title }}" ?</p>
+					<p class="text-light mb-0">Cette action est irréversible.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+					<form action="/books/{{ book._id }}/delete" method="POST">
+						<button type="submit" class="btn btn-danger">
+							<i class="fas fa-trash me-1"></i>Supprimer définitivement
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

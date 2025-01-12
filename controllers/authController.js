@@ -8,11 +8,11 @@ exports.home = (req, res) => {
 };
 
 exports.getSignupPage = (req, res) => {
-    res.render('pages/signup.twig');
+    res.render('pages/auth/signup.twig');
   };
 
 exports.getLoginPage = (req, res) => {
-res.render('pages/login.twig');
+res.render('pages/auth/login.twig');
 };
 
 exports.signup = async (req, res) => {
@@ -22,7 +22,7 @@ exports.signup = async (req, res) => {
         // Vérifier si l'utilisateur existe déjà
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.render('pages/signup', {
+            return res.render('pages/auth/signup', {
                 error: 'Email déjà utilisé.',
                 user: req.user
             });
@@ -38,14 +38,14 @@ exports.signup = async (req, res) => {
         });
         
         // Rediriger vers la page de connexion avec un message de succès
-        res.render('pages/login', {
+        res.render('pages/auth/login', {
             success: 'Inscription réussie ! Vous pouvez maintenant vous connecter.',
             user: req.user
         });
 
     } catch (err) {
         console.error(err);
-        res.render('pages/signup', {
+        res.render('pages/auth/signup', {
             error: 'Erreur lors de l\'inscription. Veuillez réessayer.',
             user: req.user
         });
@@ -59,49 +59,51 @@ exports.login = async (req, res) => {
 
         const user = await User.findOne({ email });
         if (!user) {
-            return res.render('pages/login', { 
+            return res.render('pages/auth/login', { 
                 error: 'Identifiants invalides.',
                 user: null
             });
         }
 
-        // Utilisation de la méthode comparePassword du modèle
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return res.render('pages/login', { 
+            return res.render('pages/auth/login', { 
                 error: 'Identifiants invalides.',
                 user: null
             });
         }
 
+        // S'assurer que l'ID est une chaîne
+        const userId = user._id.toString();
+
         const token = jwt.sign(
-            { userId: user._id }, 
+            { 
+                id: userId,
+                email: user.email
+            }, 
             process.env.JWT_SECRET, 
             { expiresIn: '1h' }
         );
 
         res.cookie('token', token, { 
             httpOnly: true, 
-            secure: process.env.NODE_ENV === 'production'
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600000 // 1 heure en millisecondes
         });
 
         console.log('Redirection vers le dashboard');
-        res.redirect('/books/dashboard');
+        res.redirect('/books');
 
     } catch (err) {
         console.error('Erreur login:', err);
-        res.render('pages/login', { 
+        res.render('pages/auth/login', { 
             error: 'Erreur interne du serveur.',
             user: null
         });
     }
 };
 
-exports.profile = (req, res) => {
-    res.send('Mon profil');
-  };
-
 exports.logout = (req, res) => {
-    res.send('Déconnexion');
+    res.render('pages/auth/login', { user: null });
   };
 

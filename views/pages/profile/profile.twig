@@ -14,12 +14,6 @@
             <li class="list-group-item">
                 <strong>Email : </strong> {{ user.email }}
             </li>
-            {% if user.displayName %}
-                <li class="list-group-item">
-                    <strong>Nom d'utilisateur : </strong> {{ user.displayName }}
-                </li>
-            {% endif %}
-            {# Ajoute d'autres champs si nécessaire, ex. user.firstname, etc. #}
         </ul>
     </section>
     
@@ -97,11 +91,9 @@
             ainsi que toutes vos données associées.
         </p>
 
-        <form action="/profile/delete" method="POST">
-            <button type="submit" class="btn btn-danger">
+        <a href="/profile/delete" class="btn btn-danger">
                 Supprimer mon compte
-            </button>
-        </form>
+        </a>
     </section>
 </div>
 {% endblock %}

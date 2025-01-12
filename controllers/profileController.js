@@ -1,46 +1,80 @@
 // controllers/profileController.js
 const User = require('../models/User');
 
-exports.updatePassword = async (req, res) => {
-  try {
-    const { currentPassword, newPassword, confirmNewPassword } = req.body;
-    
-    // Récupération du user en base via req.user.id
-    const user = await User.findById(req.user.id);
-    if (!user) {
-      return res.render('updatePassword', { 
-        error: 'Utilisateur introuvable.' 
-      });
+exports.profile = async (req, res) => {
+    try {
+        console.log('Accès à la page profil');
+        // Récupérer les informations complètes de l'utilisateur depuis la base de données
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).render('error/404', {
+                message: 'Utilisateur non trouvé'
+            });
+        }
+
+        // Passer l'utilisateur complet au template
+        res.render('pages/profile/profile', { 
+            user: {
+                email: user.email,
+                id: user._id,
+                // Ajoutez d'autres champs si nécessaire
+            }
+        });
+    } catch (err) {
+        console.error('Erreur lors du rendu du profil:', err);
+        res.status(500).render('error/500');
     }
-
-    // Vérification matching newPassword / confirmNewPassword
-    if (newPassword !== confirmNewPassword) {
-      return res.render('updatePassword', { 
-        error: 'Les mots de passe ne correspondent pas.' 
-      });
-    }
-
-    // Vérification du mot de passe actuel
-    const match = await user.comparePassword(currentPassword);
-    if (!match) {
-      return res.render('updatePassword', { 
-        error: 'Le mot de passe actuel est incorrect.' 
-      });
-    }
-
-    // Mise à jour
-    user.password = newPassword; // Suppose un hook .pre('save') pour le hachage
-    await user.save();
-
-    res.render('updatePassword', {
-      success: 'Mot de passe mis à jour avec succès.'
-    });
-  } catch (err) {
-    console.error(err);
-    return res.render('updatePassword', { error: 'Erreur interne du serveur.' });
-  }
 };
 
+exports.updatePassword = async (req, res) => {
+    try {
+      const { currentPassword, newPassword, confirmNewPassword } = req.body;
+      
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.render('pages/profile/profile', { 
+          passwordUpdateError: 'Utilisateur introuvable.',
+          user: req.user
+        });
+      }
+  
+      if (newPassword !== confirmNewPassword) {
+        return res.render('pages/profile/profile', { 
+          passwordUpdateError: 'Les mots de passe ne correspondent pas.',
+          user: req.user
+        });
+      }
+  
+      const match = await user.comparePassword(currentPassword);
+      if (!match) {
+        return res.render('pages/profile/profile', { 
+          passwordUpdateError: 'Le mot de passe actuel est incorrect.',
+          user: req.user
+        });
+      }
+  
+      // Mise à jour
+      user.password = newPassword;
+      await user.save();
+  
+      // Redirection vers le profil avec message de succès
+      return res.render('pages/profile/profile', {
+        passwordUpdateSuccess: 'Mot de passe mis à jour avec succès.',
+        user: req.user
+      });
+    } catch (err) {
+      console.error(err);
+      return res.render('pages/profile/profile', { 
+        passwordUpdateError: 'Erreur lors de la mise à jour du mot de passe.',
+        user: req.user
+      });
+    }
+  };
+
+exports.deleteAccountPage = (req, res) => {
+  res.render('pages/profile/delete', { user: req.user });
+};
+  
 exports.deleteAccount = async (req, res) => {
   try {
     // Supprimer l'utilisateur
@@ -48,9 +82,9 @@ exports.deleteAccount = async (req, res) => {
 
     // Option : déconnecter l'utilisateur, supprimer cookie JWT, etc.
     // On peut rediriger vers '/' ou renvoyer un message
-    res.render('delete', { success: 'Votre compte a bien été supprimé.' });
+    res.render('pages/home', { success: 'Votre compte a bien été supprimé.' });
   } catch (err) {
     console.error(err);
-    return res.render('delete', { error: 'Impossible de supprimer votre compte.' });
+    return res.render('pages/profile/profile', { error: 'Impossible de supprimer votre compte.' });
   }
 };

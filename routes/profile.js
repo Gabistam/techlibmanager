@@ -3,22 +3,16 @@ const router = express.Router();
 const auth = require('../middleware/authJwt');
 const profileController = require('../controllers/profileController');
 
-// Page de modif de mot de passe
-router.get('/update-password', auth, (req, res) => {
-  // Rendre la page updatePassword.twig
-  res.render('updatePassword.twig');
-});
+// Page de profil
+router.get('/', auth, profileController.profile);
 
 // Traitement du formulaire update-password
 router.post('/update-password', auth, profileController.updatePassword);
 
 // Page de suppression de compte
-router.get('/delete', auth, (req, res) => {
-  // Rendre la page delete.twig
-  res.render('delete.twig');
-});
+router.get('/delete', auth, profileController.deleteAccountPage);
 
 // Traitement du formulaire de suppression
-router.post('/delete', auth, profileController.deleteAccount);
+router.post('/delete', auth, profileController.deleteAccount);  // Changé de DELETE à POST
 
 module.exports = router;

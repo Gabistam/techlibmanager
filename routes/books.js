@@ -7,8 +7,8 @@ const authJwt = require('../middleware/authJwt');
 
 // Protection de toutes les routes avec authJwt
 // L'utilisateur doit être connecté pour accéder à toutes les fonctionnalités des livres
-router.get('/dashboard', authJwt, bookController.dashboard);
-router.get('/', authJwt, bookController.list);
+router.get('/', authJwt, bookController.dashboard);
+router.get('/booklist', authJwt, bookController.list);
 router.get('/new', authJwt, bookController.createForm);
 router.post('/', [authJwt, validateBookInput], bookController.create);
 router.get('/:id', authJwt, bookController.show);

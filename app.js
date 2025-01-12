@@ -11,10 +11,12 @@ const { connectDB } = require('./config/database');
 const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
 const notFoundHandler = require('./middleware/notFoundHandler');
+const userStatus = require('./middleware/userStatus');
 
 // Import des routes
 const bookRoutes = require('./routes/books');   // routes pour la gestion des livres
 const authRoutes = require('./routes/auth');    // routes pour l'authentification
+const profileRoutes = require('./routes/profile');  // routes pour le profil
 
 const app = express();
 
@@ -31,11 +33,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(requestLogger);
+app.use(userStatus);  // Pour la navbar uniquement
 
 // 4) Routes
 // Route racine vers la page d'accueil
 app.use('/', authRoutes);  // Les routes d'auth géreront la page d'accueil
 app.use('/books', bookRoutes);  // Toutes les routes de livres commencent par /books
+app.use('/profile', profileRoutes);  // Routes pour le profil
 
 // 5) Gestion des erreurs
 app.use(notFoundHandler);

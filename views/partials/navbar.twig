@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
     <div class="container">
-        <a class="navbar-brand" href="/">
+        <a class="navbar-brand" href="{{ user ? '/books' : '/' }}">
             <i class="fas fa-book-reader me-2"></i>TechLib Manager
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -13,11 +13,11 @@
                     {# L'utilisateur est connecté #}
                     
                     <li class="nav-item">
-                        <a class="nav-link" href="/dashboard"><i class="fas fa-home me-1"></i>Dashboard</a>
+                        <a class="nav-link" href="/books"><i class="fas fa-home me-1"></i>Dashboard</a>
                     </li>
                     
                     <li class="nav-item">
-                        <a class="nav-link" href="/books"><i class="fas fa-books me-1"></i>Mes livres</a>
+                        <a class="nav-link" href="/books/booklist"><i class="fas fa-books me-1"></i>Mes livres</a>
                     </li>
                     
                     <li class="nav-item">
