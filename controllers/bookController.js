@@ -175,23 +175,45 @@ exports.editForm = async (req, res) => {
 
 exports.update = async (req, res) => {
     try {
+        // S'assurer que l'ID utilisateur est correctement converti
+        const userId = new mongoose.Types.ObjectId(req.user.id);
+        
+        console.log('Update - Book ID:', req.params.id);
+        console.log('Update - User ID:', userId);
+        console.log('Update - New Data:', req.body);
+
         // Mettre à jour uniquement si le livre appartient à l'utilisateur
         const book = await Book.findOneAndUpdate(
             {
                 _id: req.params.id,
-                user: req.user.id
+                user: userId
             },
-            req.body,
-            { new: true, runValidators: true }
+            {
+                ...req.body,
+                user: userId  // Garder l'utilisateur associé
+            },
+            { 
+                new: true,
+                runValidators: true 
+            }
         );
 
         if (!book) {
+            console.log('Book not found or unauthorized');
             return res.status(404).render('error/404', { user: req.user });
         }
+
+        console.log('Book updated:', book);
+        
+        // Rediriger vers la page de détails du livre
         res.redirect('/books/' + book._id);
     } catch (err) {
+        console.error('Update error:', err);
         res.render('pages/books/edit', {
-            book: { ...req.body, _id: req.params.id },
+            book: { 
+                ...req.body, 
+                _id: req.params.id
+            },
             errors: err.errors,
             user: req.user
         });

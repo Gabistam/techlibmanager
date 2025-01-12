@@ -19,7 +19,9 @@
 
     <div class="row">
         <div class="col-lg-12">
-            {% include 'pages/books/_form.twig' with {'book': book} %}
+            <form action="/books/{{ book._id }}" method="POST">
+                {% include 'pages/books/_form.twig' with {'book': book} %}
+            </form>
         </div>
     </div>
 {% endblock %}
