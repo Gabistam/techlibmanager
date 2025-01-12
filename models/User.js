@@ -11,8 +11,15 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    // Rendre le mot de passe optionnel pour OAuth
+    required: function() {
+      return !this.googleId && !this.githubId;
+    }
   },
+  googleId: String,
+  githubId: String,
+  displayName: String,
+  avatar: String
 });
 
 // Middleware Mongoose pour hasher le mot de passe avant sauvegarde
