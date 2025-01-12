@@ -1,10 +1,10 @@
-// controllers/profileController.js
 const User = require('../models/User');
 
+// Affichage du profil utilisateur
 exports.profile = async (req, res) => {
     try {
         console.log('Accès à la page profil');
-        // Récupérer les informations complètes de l'utilisateur depuis la base de données
+        // Récupérer les informations complètes de l'utilisateur
         const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).render('error/404', {
@@ -12,12 +12,12 @@ exports.profile = async (req, res) => {
             });
         }
 
-        // Passer l'utilisateur complet au template
+        // Rendre la page avec les informations utilisateur
         res.render('pages/profile/profile', { 
             user: {
                 email: user.email,
                 id: user._id,
-                // Ajoutez d'autres champs si nécessaire
+                // Ajouter d'autres champs si nécessaire
             }
         });
     } catch (err) {
@@ -26,65 +26,76 @@ exports.profile = async (req, res) => {
     }
 };
 
+// Mise à jour du mot de passe utilisateur
 exports.updatePassword = async (req, res) => {
     try {
-      const { currentPassword, newPassword, confirmNewPassword } = req.body;
-      
-      const user = await User.findById(req.user.id);
-      if (!user) {
-        return res.render('pages/profile/profile', { 
-          passwordUpdateError: 'Utilisateur introuvable.',
-          user: req.user
+        const { currentPassword, newPassword, confirmNewPassword } = req.body;
+
+        // Vérifier si l'utilisateur existe
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.render('pages/profile/profile', { 
+                passwordUpdateError: 'Utilisateur introuvable.',
+                user: req.user
+            });
+        }
+
+        // Vérifier si les nouveaux mots de passe correspondent
+        if (newPassword !== confirmNewPassword) {
+            return res.render('pages/profile/profile', { 
+                passwordUpdateError: 'Les mots de passe ne correspondent pas.',
+                user: req.user
+            });
+        }
+
+        // Vérifier le mot de passe actuel
+        const match = await user.comparePassword(currentPassword);
+        if (!match) {
+            return res.render('pages/profile/profile', { 
+                passwordUpdateError: 'Le mot de passe actuel est incorrect.',
+                user: req.user
+            });
+        }
+
+        // Mettre à jour le mot de passe
+        user.password = newPassword;
+        await user.save();
+
+        // Rendre la page avec un message de succès
+        return res.render('pages/profile/profile', {
+            passwordUpdateSuccess: 'Mot de passe mis à jour avec succès.',
+            user: req.user
         });
-      }
-  
-      if (newPassword !== confirmNewPassword) {
-        return res.render('pages/profile/profile', { 
-          passwordUpdateError: 'Les mots de passe ne correspondent pas.',
-          user: req.user
-        });
-      }
-  
-      const match = await user.comparePassword(currentPassword);
-      if (!match) {
-        return res.render('pages/profile/profile', { 
-          passwordUpdateError: 'Le mot de passe actuel est incorrect.',
-          user: req.user
-        });
-      }
-  
-      // Mise à jour
-      user.password = newPassword;
-      await user.save();
-  
-      // Redirection vers le profil avec message de succès
-      return res.render('pages/profile/profile', {
-        passwordUpdateSuccess: 'Mot de passe mis à jour avec succès.',
-        user: req.user
-      });
     } catch (err) {
-      console.error(err);
-      return res.render('pages/profile/profile', { 
-        passwordUpdateError: 'Erreur lors de la mise à jour du mot de passe.',
-        user: req.user
-      });
+        console.error('Erreur lors de la mise à jour du mot de passe:', err);
+        return res.render('pages/profile/profile', { 
+            passwordUpdateError: 'Erreur lors de la mise à jour du mot de passe.',
+            user: req.user
+        });
     }
-  };
-
-exports.deleteAccountPage = (req, res) => {
-  res.render('pages/profile/delete', { user: req.user });
 };
-  
-exports.deleteAccount = async (req, res) => {
-  try {
-    // Supprimer l'utilisateur
-    await User.findByIdAndDelete(req.user.id);
 
-    // Option : déconnecter l'utilisateur, supprimer cookie JWT, etc.
-    // On peut rediriger vers '/' ou renvoyer un message
-    res.render('pages/home', { success: 'Votre compte a bien été supprimé.' });
-  } catch (err) {
-    console.error(err);
-    return res.render('pages/profile/profile', { error: 'Impossible de supprimer votre compte.' });
-  }
+// Afficher la page de suppression de compte
+exports.deleteAccountPage = (req, res) => {
+    res.render('pages/profile/delete', { user: req.user });
+};
+
+// Suppression définitive du compte utilisateur
+exports.deleteAccount = async (req, res) => {
+    try {
+        // Supprimer l'utilisateur de la base de données
+        await User.findByIdAndDelete(req.user.id);
+
+        // Optionnel : déconnecter l'utilisateur en supprimant le cookie JWT
+        res.clearCookie('token');
+        res.render('pages/home', { 
+            success: 'Votre compte a bien été supprimé.'
+        });
+    } catch (err) {
+        console.error('Erreur lors de la suppression du compte:', err);
+        return res.render('pages/profile/profile', { 
+            error: 'Impossible de supprimer votre compte.',
+            user: req.user
+        });
+    }
 };

@@ -1,10 +1,15 @@
-// controllers/authController.js
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const passport = require('passport');
+// Importation de bcrypt pour hacher et comparer les mots de passe.
 
-// Fonction utilitaire pour générer un token JWT
+const jwt = require('jsonwebtoken');
+// Importation de jsonwebtoken pour la génération et la validation des tokens JWT.
+
+const User = require('../models/User');
+// Modèle utilisateur pour interagir avec la base de données.
+
+const passport = require('passport');
+// Module Passport.js pour gérer l'authentification OAuth et autres stratégies.
+
 const generateToken = (user) => {
     return jwt.sign(
         { id: user._id.toString(), email: user.email },
@@ -12,8 +17,11 @@ const generateToken = (user) => {
         { expiresIn: '1h' }
     );
 };
+// Cette fonction crée un token JWT en utilisant :
+// - `user._id` et `user.email` comme données à inclure dans le token.
+// - Une clé secrète définie dans `process.env.JWT_SECRET` pour signer le token.
+// - Une durée d'expiration de 1 heure (`expiresIn: '1h'`).
 
-// Fonction pour gérer la réponse OAuth
 const handleOAuthResponse = (req, res) => {
     const token = generateToken(req.user);
     res.cookie('token', token, {
@@ -23,25 +31,28 @@ const handleOAuthResponse = (req, res) => {
     });
     res.redirect('/books');
 };
+// Cette fonction est appelée après une authentification OAuth réussie.
+// Elle génère un token JWT pour l'utilisateur et l'enregistre dans un cookie HTTP sécurisé.
 
-// Pages de rendu
 exports.home = (req, res) => {
     res.render('pages/home');
 };
+// Affiche la page d'accueil.
 
 exports.getSignupPage = (req, res) => {
     res.render('pages/auth/signup');
 };
+// Affiche la page d'inscription.
 
 exports.getLoginPage = (req, res) => {
     res.render('pages/auth/login');
 };
+// Affiche la page de connexion.
 
-// Authentification classique
 exports.signup = async (req, res) => {
     try {
         const { email, password } = req.body;
-        
+
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.render('pages/auth/signup', {
@@ -49,10 +60,10 @@ exports.signup = async (req, res) => {
                 user: req.user
             });
         }
-        
+
         const newUser = new User({ email, password });
         await newUser.save();
-        
+
         res.render('pages/auth/login', {
             success: 'Inscription réussie ! Vous pouvez maintenant vous connecter.',
             user: req.user
@@ -65,11 +76,15 @@ exports.signup = async (req, res) => {
         });
     }
 };
+// Fonction d'inscription :
+// - Vérifie si l'email existe déjà.
+// - Si non, crée un nouvel utilisateur et le sauvegarde dans la base.
+// - Redirige ensuite l'utilisateur vers la page de connexion.
 
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        
+
         const user = await User.findOne({ email });
         if (!user || !(await user.comparePassword(password))) {
             return res.render('pages/auth/login', { 
@@ -94,12 +109,16 @@ exports.login = async (req, res) => {
         });
     }
 };
+// Fonction de connexion :
+// - Vérifie que l'utilisateur existe et que le mot de passe est correct.
+// - Si oui, génère un token JWT et le stocke dans un cookie.
+// - Redirige l'utilisateur vers la page `/books`.
 
-// Authentification OAuth
 exports.googleAuth = passport.authenticate('google', {
     scope: ['profile', 'email'],
     session: false
 });
+// Initialise l'authentification avec Google en spécifiant les scopes nécessaires.
 
 exports.googleCallback = [
     passport.authenticate('google', { 
@@ -108,15 +127,12 @@ exports.googleCallback = [
     }),
     (req, res) => {
         try {
-            console.log('Google callback user:', req.user);
             const token = generateToken(req.user);
-            
             res.cookie('token', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 maxAge: 3600000
             });
-            
             res.redirect('/books');
         } catch (error) {
             console.error('Google callback error:', error);
@@ -124,11 +140,16 @@ exports.googleCallback = [
         }
     }
 ];
+// Gère le callback après l'authentification réussie avec Google :
+// - Génère un token JWT.
+// - Stocke le token dans un cookie sécurisé.
+// - Redirige l'utilisateur vers `/books`.
 
 exports.githubAuth = passport.authenticate('github', {
     scope: ['user:email'],
     session: false
 });
+// Initialise l'authentification avec GitHub en demandant l'accès aux emails.
 
 exports.githubCallback = [
     passport.authenticate('github', { 
@@ -137,38 +158,26 @@ exports.githubCallback = [
     }),
     (req, res) => {
         try {
-            console.log('GitHub callback - req.user:', req.user);
-            
-            if (!req.user) {
-                console.error('No user object in GitHub callback');
-                return res.redirect('/login');
-            }
-
-            if (!req.user._id) {
-                console.error('User object missing _id:', req.user);
-                return res.redirect('/login');
-            }
-
             const token = generateToken(req.user);
-            console.log('Generated token:', token);
-
             res.cookie('token', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 maxAge: 3600000
             });
-            
             res.redirect('/books');
         } catch (error) {
             console.error('GitHub callback error:', error);
-            console.error('Error stack:', error.stack);
             res.redirect('/login');
         }
     }
 ];
+// Même logique que pour Google :
+// - Authentifie l'utilisateur avec GitHub.
+// - Génère un token JWT, le stocke dans un cookie, et redirige.
 
 exports.logout = (req, res) => {
     res.clearCookie('token');
     res.locals.user = null;
     res.redirect('/login');
 };
+// Supprime le cookie contenant le token JWT et redirige l'utilisateur vers la page de connexion.
