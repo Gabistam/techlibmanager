@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 
 module.exports = (req, res, next) => {
   try {
@@ -17,7 +16,7 @@ module.exports = (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     // S'assurer que l'ID est au bon format pour MongoDB
-    const userId = new mongoose.Types.ObjectId(decoded.id); // Correction ici
+    const userId = new mongoose.Types.ObjectId(decoded.id); 
 
     // Ajouter les informations aux deux endroits
     req.user = {
